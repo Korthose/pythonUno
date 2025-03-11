@@ -3,49 +3,42 @@ import pygame
 from socket import *
 from pygame.locals import *
 from Objects.Card import Card
+from Objects.Deck import Deck
 
-
+#variables
 cards = []
+Deck = Deck()
 
 # Initialise screen
 pygame.init()
 pygame.display.init()
 
 screen = pygame.display.set_mode((1280, 720))
-pygame.display.set_caption('Basic Pygame program')
+pygame.display.set_caption('Python')
 
 # Fill background
-screen.fill((250, 250, 250))
+screen.fill((159, 217, 255))
 
-def randCards(cards):
-    color = ['Red', 'Blue', 'Yellow', 'Green']
-    # game starts
-    if not cards:
-        for i in range(8):
-            randomCombo = {
-                'number': random.randint(1, 9),
-                'color': random.choice(color)
-            }
+Deck.createDeck()
 
-            cards.append(Card(randomCombo['number'], randomCombo['color']))
-        return True
-
-    else:
-        randomCombo = {
-            'number': random.randint(1, 9),
-            'color': random.choice(color)
-        }
-
-        cards.append(Card(randomCombo['number'], randomCombo['color']))
-
-# Event loop
+#Event loop
 while True:
     for event in pygame.event.get():
         if event.type == QUIT:
             exit()
+        # elif event.type == MOUSEBUTTONDOWN:
+        #     for card in list(cards):  # Use list(cards) to create a copy
+        #         if card.playCard(event, startingCard):
+        #             # remove the played card
+        #             cards.remove(card)
+        #
+        #             # generate new starting card
+        #             randomCombo = {
+        #                 'number': random.randint(1, 5),
+        #                 'color': random.choice(color)
+        #             }
+        #             startingCard = Card(randomCombo['number'], randomCombo['color'])
+        #             break  # Important: Exit the inner loop after removing a card
+    Deck.starter()
 
-    randCards(cards)
-    for i, card in enumerate(cards):
-        card.moveTo(250, 50 + (i * 32//4) )
-        card.draw(screen)
     pygame.display.flip()

@@ -19,26 +19,34 @@ pygame.display.set_caption('Python')
 # Fill background
 screen.fill((159, 217, 255))
 
+# Initial deck creation
 Deck.createDeck()
+Deck.starter()
 
 #Event loop
 while True:
+    mouse = pygame.mouse.get_pos()
+
     for event in pygame.event.get():
         if event.type == QUIT:
             exit()
-        # elif event.type == MOUSEBUTTONDOWN:
-        #     for card in list(cards):  # Use list(cards) to create a copy
-        #         if card.playCard(event, startingCard):
-        #             # remove the played card
-        #             cards.remove(card)
-        #
-        #             # generate new starting card
-        #             randomCombo = {
-        #                 'number': random.randint(1, 5),
-        #                 'color': random.choice(color)
-        #             }
-        #             startingCard = Card(randomCombo['number'], randomCombo['color'])
-        #             break  # Important: Exit the inner loop after removing a card
-    Deck.starter()
+        elif event.type == MOUSEBUTTONDOWN:
+            if event.button == 1 and pygame.Rect.collidepoint(Deck.stackRect, mouse):
+                Deck.pullCards(1)
+                Deck.redraw()
+                break
 
-    pygame.display.flip()
+            for playerCard in list(Deck.playerCards):
+                if playerCard.playing(event, Deck.initialCard, mouse):
+                    # remove the played card & generate new starter card
+                    screen.fill((159, 217, 255))
+                    Deck.cardPlayed(playerCard)
+                    break
+            # if event.button == 1 and pygame.Rect.collidepoint(, mouse):
+
+    # for playerCard in list(Deck.playerCards):
+    #     if playerCard.rect.collidepoint(mouse):
+    #         playerCard.rect.y -= 20
+    #         playerCard.draw(screen)
+
+    pygame.display.update()

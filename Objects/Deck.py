@@ -8,17 +8,22 @@ from testing import randCards
 
 class Deck:
     def __init__(self):
+        self.card_width = 180
+        self.card_height = 180
 
         self.red = 'Red'
         self.blue = 'Blue'
         self.yellow = 'Yellow'
         self.green = 'Green'
 
-        self.deck = []
         self.playerCards = []
         self.cards = []
 
-        self.startingCard = Card(random.randint(0, 9), random.choice(['Red', 'Blue', 'Yellow', 'Green']))
+        self.cardStack = pygame.image.load("Resources/Sprites/Cards/Special/card_back.png").convert_alpha()
+        self.cardStack = pygame.transform.scale(self.cardStack, (180, 180))
+        self.stackRect = self.cardStack.get_rect()
+
+        self.initialCard = Card(random.randint(0, 9), random.choice(['Red', 'Blue', 'Yellow', 'Green']))
 
         self.screen = pygame.display.set_mode((1280, 720))
         self.screen.fill((159, 217, 255))
@@ -58,50 +63,57 @@ class Deck:
         colors = self.randColor()
         numbers = self.randInt()
 
+        self.stackedCards()
+
         for i in range(76):
             # make card instance
             self.cards.append(Card(numbers[i], colors[i]))
 
         self.pullCards(7)
-        print(self.cards)
 
     # used for initial player deck & pulling cards
     def pullCards(self, pulledCard):
-        self.playerCards = self.cards[:pulledCard]
+        if not self.playerCards:
+            self.playerCards.extend(self.cards[:pulledCard])
+        else:
+            self.playerCards = self.cards[:pulledCard]
+
         del self.cards[:pulledCard]
 
+    def stackedCards(self):
+        self.stackRect.topleft = (((1280 - 180) // 2) + 160, (720 - 180) // 2)
+        self.screen.blit(self.cardStack, self.stackRect)
+
+    def redraw(self):
+        self.starter()
+
+        self.stackedCards()
+
+        pygame.display.flip()
+
+    def cardPlayed(self, matchedCard):
+        # remove played card
+        self.playerCards.remove(matchedCard)
+
+        # declare played card as next card on table
+        self.initialCard = matchedCard
+
+        self.redraw()
+
     def starter(self):
-        card_width = 180  # From your Card class
-        start_x = (1280 - (len(self.playerCards) * card_width)) // 2
-        start_y = 670 - card_width
+        start_x = (1280 - (len(self.playerCards) * self.card_width)) // 2
+        start_y = 670 - self.card_width
 
         # card on table
-        self.startingCard.moveTo((1280 - card_width) // 2, (720 - 180) // 2)
-        self.startingCard.draw(self.screen)
+        self.initialCard.moveTo(((1280 - self.card_width) // 2) - 180, (720 - 180) // 2)
+        self.initialCard.draw(self.screen)
 
         # playing card
         for i, card in enumerate(self.playerCards):
-            x = start_x + i * card_width
+            x = start_x + i * self.card_width
             y = start_y
             card.moveTo(x, y)
             # startingCard.moveTo(x)
             card.draw(self.screen)
 
-    # game starts
-    # if not self.cardLength:
-    #
-    #     # # creating a starting card to place on
-    #     # randomCombo = {
-    #     #     'number': random.randint(1, 5),
-    #     #     'color': random.choice(color)
-    #     # }
-    #     # startingCard = Card(randomCombo['number'], randomCombo['color'])
-    #
-    #     return True
-    # # else:
-    # #     randomCombo = {
-    # #         'number': random.randint(1, 9),
-    # #         'color': random.choice(color)
-    # #     }
-    # #
-    # #     cards.append(Card(randomCombo['number'], randomCombo['color']))
+        print(self.playerCards)

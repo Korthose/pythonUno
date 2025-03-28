@@ -3,7 +3,6 @@ import random
 import pygame
 
 from Objects.Card import Card
-from testing import randCards
 
 
 class Deck:
